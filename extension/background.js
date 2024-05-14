@@ -40,6 +40,8 @@ chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
 });
 
 chrome.tabs.onCreated.addListener(function (tab) {
+    
+
     var currentTime = new Date().toLocaleTimeString();
     console.log(`[${currentTime}] Tab created:`, tab.url);
 

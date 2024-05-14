@@ -1,7 +1,6 @@
 import numpy as np
 import mss
 import time
-import webbrowser
 import pyautogui
 import cv2
 
@@ -27,4 +26,10 @@ while True:
     scr_remove = scr[:,:,:3]
     result = cv2.matchTemplate(scr_remove, facebook, cv2.TM_CCOEFF_NORMED)
     _, max_val, _, max_loc = cv2.minMaxLoc(result)
-    open_close()
+    print(max_val)
+    
+    if max_val > 0.8:  # Adjust this threshold as needed
+        open_close()
+        break
+    else:
+        time.sleep(1)  # Adjust sleep time as needed
