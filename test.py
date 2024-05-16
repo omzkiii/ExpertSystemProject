@@ -1,7 +1,11 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import time
+from clickScreen import executeCommand
+
 
 app = Flask(__name__)
+CORS(app)  
 url_timestamp = {}
 url_viewtime = {}
 prev_url = ""
@@ -12,6 +16,11 @@ def url_strip(url):
     if "/" in url:
         url = url.split('/', 1)[0]
     return url
+
+
+def execute_command_if_facebook(url):
+    if "facebook" in url.lower():
+        executeCommand() 
 
 @app.route('/send_url', methods=['POST'])
 def send_url():
@@ -25,9 +34,11 @@ def send_url():
     global url_viewtime
     global prev_url
 
-    print("initial db prev tab: ", prev_url)
+    execute_command_if_facebook(parent_url)
+
+    """print("initial db prev tab: ", prev_url)
     print("initial db timestamp: ", url_timestamp)
-    print("initial db viewtime: ", url_viewtime)
+    print("initial db viewtime: ", url_viewtime)"""
 
     if parent_url not in url_timestamp.keys():
         url_viewtime[parent_url] = 0
@@ -39,8 +50,8 @@ def send_url():
     x = int(time.time())
     url_timestamp[parent_url] = x
     prev_url = parent_url
-    print("final timestamps: ", url_timestamp)
-    print("final viewtimes: ", url_viewtime)
+    #print("final timestamps: ", url_timestamp)
+    #print("final viewtimes: ", url_viewtime)
 
     return jsonify({'message': 'success!'}), 200
 
