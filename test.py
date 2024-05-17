@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import time
 from clickScreen import executeCommand
+from threading import Timer
 
 
 app = Flask(__name__)
@@ -18,9 +19,49 @@ def url_strip(url):
     return url
 
 
-def execute_command_if_facebook(url):
+banned_tabs = []
+
+def execute_command(url, type):
+    global banned_tabs_count
+
+    platform = None
     if "facebook" in url.lower():
-        executeCommand() 
+        platform = "facebook"
+    elif "instagram" in url.lower():
+        platform = "instagram"
+    elif "reddit" in url.lower():
+        platform = "reddit"
+    elif "twitter" in url.lower():
+        platform = "twitter"
+    elif "netflix" in url.lower():
+        platform = "netflix"
+    elif "pornhub" in url.lower():
+        platform = "pornhub"
+    elif "tiktok" in url.lower():
+        platform = "tiktok"
+    
+    if platform:
+        if(type == "DEL"):
+            print("Closed ${platform}")
+            banned_tabs.remove(platform)
+        elif (type == "TAB") :
+            banned_tabs.append(platform)
+        print(banned_tabs)
+
+
+
+def execute_commands_periodically():
+    global banned_tabs
+    if banned_tabs:
+        for platform in banned_tabs:
+            # Call execute_command with a dummy URL and type (adjust as needed)
+            executeCommand(platform)
+
+    # Reset timer to run after 3 minutes again
+    Timer(180.0, execute_commands_periodically).start()
+
+execute_commands_periodically()
+
 
 @app.route('/send_url', methods=['POST'])
 def send_url():
@@ -34,7 +75,7 @@ def send_url():
     global url_viewtime
     global prev_url
 
-    execute_command_if_facebook(parent_url)
+    execute_command(parent_url, "TAB")
 
     """print("initial db prev tab: ", prev_url)
     print("initial db timestamp: ", url_timestamp)
@@ -57,6 +98,13 @@ def send_url():
 
 @app.route('/quit_url', methods=['POST'])
 def quit_url():
+    resp_json = request.get_data()
+    params = resp_json.decode()
+    url = params.replace("url=", "")
+    print("currently viewing: " + url_strip(url))
+    parent_url = url_strip(url)
+
+    execute_command(parent_url, "DEL")
     resp_json = request.get_data()
     print("Url closed: " + resp_json.decode())
     return jsonify({'message': 'quit success!'}), 200

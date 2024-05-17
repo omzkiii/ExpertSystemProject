@@ -16,6 +16,8 @@ function callPyBackend(tab) {
         });
 }
 
+
+
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     chrome.tabs.get(activeInfo.tabId, function (tab) {
 
@@ -27,7 +29,7 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
 
 
         // Send URL to Flask server
-        callPyBackend(tab);
+        //callPyBackend(tab);
 
 
         // Check if URL contains "facebook" using regex
@@ -62,10 +64,28 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 });
 
 chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
+    fetch('http://localhost:5000/quit_url', {
+            method: 'POST',
+            body: 'url=' + encodeURIComponent(tabToUrl[tabId])
+        }).then(response => {
+            if (response.ok) {
+                console.log('URL sent successfully.');
+            } else {
+                console.error('Failed to send URL.');
+                console.error('Failed to send URL:', response.status, response.statusText);
+
+            }
+        }).catch(error => { // Catch any network errors
+            console.error('Error:', error);
+        });
+
     var currentTime = new Date().toLocaleTimeString();
     console.log(`[${currentTime}] Removed tab:`, tabToUrl[tabId]);
 
     delete tabToUrl[tabId];
+
+    
+    
 });
 
 

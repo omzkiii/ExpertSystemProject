@@ -15,7 +15,7 @@ def find_button_with_confidence(image_path, confidence=0.8):
     Locates an image on the screen with a confidence threshold to account for variations.
 
     Args:
-        image_path (str): Path to the image file (e.g., 'facebook.jpg').
+        image_path (str): Path to the image file (e.g., 'instagram.jpg').
         confidence (float, optional): Confidence level for the image match (default: 0.8).
 
     Returns:
@@ -49,9 +49,9 @@ def find_button_with_confidence(image_path, confidence=0.8):
 
 # Find the button location with a confidence threshold of 0.8
     
-def executeCommand(): 
+def executeCommand(icon): 
     print("Execute")
-    button7location = find_button_with_confidence('logo3.png', confidence=0.9)
+    button7location = find_button_with_confidence(f'./icons/{icon}.png', confidence=0.9)
 
     if button7location is not None:
         # Get the screen size
@@ -62,7 +62,7 @@ def executeCommand():
         # Check if the found location is within the screen bounds
         if 0 <= button7location[0] <= screen_width * 2 and 0 <= button7location[1] <= screen_height * 2:
             # Capture a portion of the screen containing the detected button
-            button_width, button_height = cv2.imread('logo3.png', cv2.IMREAD_GRAYSCALE).shape[::-1]
+            button_width, button_height = cv2.imread('./icons/instagram.png', cv2.IMREAD_GRAYSCALE).shape[::-1]
             button_area = screen_np[button7location[1]:button7location[1]+button_height, 
                                     button7location[0]:button7location[0]+button_width]
 
@@ -95,3 +95,4 @@ def executeCommand():
             print("Found location is out of screen bounds.")
     else:
         print("Couldn't find the button 'logo3.png' on the screen.")
+
