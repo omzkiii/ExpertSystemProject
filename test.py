@@ -3,6 +3,9 @@ from flask_cors import CORS
 import time
 from clickScreen import executeCommand
 from threading import Timer
+from playsound import playsound
+import os
+from threading import Thread
 
 
 app = Flask(__name__)
@@ -48,19 +51,26 @@ def execute_command(url, type):
             banned_tabs.append(platform)
         print(banned_tabs)
 
-
+def play_warning_sound():
+    playsound('warning.mp3')  # Adjust the command as needed
+    time.sleep(1)  # Adjust the delay between plays as needed
 
 def execute_commands_periodically():
     global banned_tabs
     if banned_tabs:
+        #play_warning_sound()
         for platform in banned_tabs:
             # Call execute_command with a dummy URL and type (adjust as needed)
             executeCommand(platform)
-
     # Reset timer to run after 3 minutes again
-    Timer(180.0, execute_commands_periodically).start()
+    Timer(25.0, execute_commands_periodically).start()
+
+# Start the initial timer
+    
+
 
 execute_commands_periodically()
+
 
 
 @app.route('/send_url', methods=['POST'])
